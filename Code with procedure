@@ -1,0 +1,42 @@
+Apparatus: Node MCU (ESP8266), GPS Module (NEO-6M), Jumper Wires
+
+Step 1: connect ESP to PC and give 3.3v to the NodeMCU
+Step 2:  connect NEO 6M using jumper wires 
+Step 3: Install BLYNK App in Android and insert token into your code
+Step 4: Connect NodeMCU to your Wireless network
+Step 5: Write Code into Arduino IDE
+#define BLYNK_PRINT Serial
+#include <SPI.h>
+#include <ESP8266WiFi.h>
+#include "TinyGPS++.h"
+#include "SoftwareSerial.h"
+SoftwareSerial serial_connection (4, 3);
+TinyGPSPlus gps;
+#include <BlynkSimpleEsp8266.h>
+char auth [] ="Token of Blynk App ";
+// Your WiFi credentials.
+// Set password to "" for open networks.
+char ssid[] = "Wireless Name";
+char pass[] = "Wireless Password";
+WidgetMap myMap(0);
+void setup()
+{
+    Blynk.begin(auth, ssid, pass);
+}
+void loop()
+{
+    Serial.begin(9600);
+  serial_connection.begin(9600);
+  Serial.println("GPS Start");
+  while(serial_connection.available())
+  {
+    gps.encode(serial_connection.read());
+  }
+ int index = 1;
+  float lon = gps.location.lng();
+  float lat = gps.location.lat();
+  Serial.print(lat);
+  Serial.print(lon);
+  myMap.location(index, lat, lon, "value");
+  Blynk.run(); 
+}
